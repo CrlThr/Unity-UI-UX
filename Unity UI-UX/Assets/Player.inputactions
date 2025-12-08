@@ -37,7 +37,7 @@
                     "isPartOfComposite": false
                 },
                 {
-                    "name": "wasd",
+                    "name": "ws",
                     "id": "1a206992-ce36-4ef2-b293-84737222dc59",
                     "path": "2DVector",
                     "interactions": "",
@@ -70,37 +70,48 @@
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "left",
-                    "id": "19ce95b1-cdca-4aaa-b13f-42e325b6dda1",
-                    "path": "<Keyboard>/a",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
-                    "name": "right",
-                    "id": "8be47a2e-77d6-4d9a-add7-f2089ba5074b",
-                    "path": "<Keyboard>/d",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": true
-                },
-                {
                     "name": "",
-                    "id": "b969c4d1-93d3-4eea-b1a5-c0754f877f78",
-                    "path": "<Mouse>/delta",
+                    "id": "50047cb6-e3e4-4388-a9ee-e9829d3d1c1e",
+                    "path": "",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Look",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "ad",
+                    "id": "0a4ba9e7-0188-4d0c-9d63-ac6e31fe77cc",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Look",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "Left",
+                    "id": "bb9fa178-d766-4241-8a36-97465820e150",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Right",
+                    "id": "32d6e3b1-2d90-44d1-bf33-c8d932bff811",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Look",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }

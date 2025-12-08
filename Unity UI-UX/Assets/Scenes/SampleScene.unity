@@ -531,9 +531,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  rotationSpeed: 5
+  rotateSpeed: 100
   rigidBody: {fileID: 774035564}
-  minMaxYaw: {x: -70, y: 70}
   root: {fileID: 1231859600}
   head: {fileID: 330585546}
 --- !u!114 &774035566
