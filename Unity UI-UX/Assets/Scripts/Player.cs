@@ -1,29 +1,28 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
 
 public class Player : MonoBehaviour
 {
-
     [Header("Movement")]
     [SerializeField] private float speed = 5f;
     [SerializeField] private float rotateSpeed = 5f;
     [SerializeField] private Rigidbody rigidBody = null;
-    private float rotateAmount = 90;
 
     [Header("Transforms")]
     [SerializeField] private Transform root = null;
     [SerializeField] private Transform head = null;
 
+    [Header("Interaction")]
+    [SerializeField] private float interactRange = 10f;
+
     private Vector3 input = Vector3.zero;
     private float targetYaw;
     private float currentYaw;
 
-    private void Reset()
-    {
-        rigidBody = GetComponent<Rigidbody>();
-    }
 
+    [SerializeField] private UIObject Objui;
+
+    private void Reset() => rigidBody = GetComponent<Rigidbody>();
 
     public void Player_OnMove(CallbackContext context)
     {
@@ -32,17 +31,13 @@ public class Player : MonoBehaviour
         input.y = 0;
     }
 
-    public void Player_OnLook(InputAction.CallbackContext context)
+    public void Player_OnLook(CallbackContext context)
     {
-        if (!context.performed)
-            return;
-
-        Vector2 input = context.ReadValue<Vector2>(); 
-        float x = input.x;
-
-        if (x != 0)
-            targetYaw += x * rotateAmount;
+        if (!context.performed) return;
+        float x = context.ReadValue<Vector2>().x;
+        targetYaw += x * 90f;
     }
+
 
     private void LateUpdate()
     {
@@ -52,6 +47,8 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rigidBody.linearVelocity = root.rotation * (speed * input.normalized);
+        Vector3 move = root.forward * input.z + root.right * input.x;
+        rigidBody.linearVelocity = move * speed + new Vector3(0, rigidBody.linearVelocity.y, 0);
     }
+
 }
