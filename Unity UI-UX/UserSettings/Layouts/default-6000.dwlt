@@ -8,6 +8,33 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
+<<<<<<< HEAD
+=======
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 12004, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PixelRect:
+    serializedVersion: 2
+    x: 1164
+    y: 379
+    width: 748
+    height: 578
+  m_ShowMode: 0
+  m_Title: Package Manager
+  m_RootView: {fileID: 4}
+  m_MinSize: {x: 748, y: 276}
+  m_MaxSize: {x: 4000, y: 4026}
+  m_Maximized: 0
+--- !u!114 &2
+MonoBehaviour:
+  m_ObjectHideFlags: 52
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+>>>>>>> 791ee26a1f5166fe8159e8d598d5468b133c8e5c
   m_EditorHideFlags: 1
   m_Script: {fileID: 12004, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
@@ -768,7 +795,11 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
+<<<<<<< HEAD
     m_Target: {x: -6.4214187, y: 2.7662115, z: 0.17514038}
+=======
+    m_Target: {x: -19.393082, y: -0.25255018, z: -16.180552}
+>>>>>>> 791ee26a1f5166fe8159e8d598d5468b133c8e5c
     speed: 2
     m_Value: {x: -6.4214187, y: 2.7662115, z: 0.17514038}
   m_RenderMode: 0
@@ -816,11 +847,19 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
+<<<<<<< HEAD
     m_Target: {x: -0.18492918, y: -0.13548464, z: 0.025735397, w: -0.9730458}
+=======
+    m_Target: {x: 0.039022926, y: -0.92139846, z: 0.09599496, w: 0.37455904}
+>>>>>>> 791ee26a1f5166fe8159e8d598d5468b133c8e5c
     speed: 2
     m_Value: {x: -0.18492918, y: -0.13548464, z: 0.025735397, w: -0.97304577}
   m_Size:
+<<<<<<< HEAD
     m_Target: 12.008577
+=======
+    m_Target: 21.121191
+>>>>>>> 791ee26a1f5166fe8159e8d598d5468b133c8e5c
     speed: 2
     m_Value: 12.008577
   m_Ortho:
@@ -1020,10 +1059,17 @@ MonoBehaviour:
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
+<<<<<<< HEAD
     scrollPos: {x: 0, y: 51}
     m_SelectedIDs: bcad0000
     m_LastClickedID: 44476
     m_ExpandedIDs: 000000000aae0000
+=======
+    scrollPos: {x: 0, y: 79}
+    m_SelectedIDs: 08140100
+    m_LastClickedID: 70664
+    m_ExpandedIDs: 0000000026af0000
+>>>>>>> 791ee26a1f5166fe8159e8d598d5468b133c8e5c
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1052,7 +1098,11 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
+<<<<<<< HEAD
     m_ExpandedIDs: 000000000aae0000
+=======
+    m_ExpandedIDs: 0000000026af0000
+>>>>>>> 791ee26a1f5166fe8159e8d598d5468b133c8e5c
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
