@@ -10,55 +10,45 @@ public class HoldableItem : MonoBehaviour
     [HideInInspector] public GameObject iconInstance;
     [HideInInspector] public bool isLeftHand;
 
-    private static Camera iconCamera;
+    public Camera leftHandCamera;
+    public Camera rightHandCamera;
+
     private static RenderTexture slot1Texture;
     private static RenderTexture slot2Texture;
 
     private Transform player;
 
-    void SetupIconCamera()
+    // Utility function to set layer for object and all children
+    private void SetLayerRecursively(Transform obj, int layer)
     {
-        if (iconCamera != null) return;
-
-        GameObject camGO = new GameObject("HiddenIconCamera");
-        iconCamera = camGO.AddComponent<Camera>();
-        iconCamera.clearFlags = CameraClearFlags.Color;
-        iconCamera.backgroundColor = Color.clear;
-        iconCamera.cullingMask = LayerMask.GetMask("ItemIcon");
-        iconCamera.enabled = false;
+        obj.gameObject.layer = layer;
+        foreach (Transform child in obj)
+            SetLayerRecursively(child, layer);
     }
 
-    // Call when picking up the item
     public void Pickup(Transform playerTransform, Transform canvas)
     {
         player = playerTransform;
 
-        // Pick a free slot
         if (leftHand == null) { leftHand = this; isLeftHand = true; }
         else if (rightHand == null) { rightHand = this; isLeftHand = false; }
         else { Debug.Log("Both hands full"); return; }
 
-        SetupIconCamera();
-
-        // Hide the object in world
-        gameObject.SetActive(false);
-
-        // Create RenderTexture for this item
+        Camera handCam = isLeftHand ? leftHandCamera : rightHandCamera;
         RenderTexture rt = new RenderTexture(256, 256, 16);
-        if (isLeftHand) slot1Texture = rt; else slot2Texture = rt;
+        if (isLeftHand) slot1Texture = rt;
+        else slot2Texture = rt;
 
-        // Move item in front of the icon camera
-        gameObject.SetActive(true); // temporarily visible for rendering
-        gameObject.layer = LayerMask.NameToLayer("ItemIcon");
-        transform.SetParent(iconCamera.transform, false);
-        transform.localPosition = Vector3.forward * 2f;
-        transform.localRotation = Quaternion.identity;
+        SetLayerRecursively(transform, LayerMask.NameToLayer("ItemIcon"));
 
-        // Render to texture
-        iconCamera.targetTexture = rt;
-        iconCamera.Render();
+        transform.position = handCam.transform.position + handCam.transform.forward * 2f;
+        transform.rotation = Quaternion.identity;
 
-        // Create UI icon
+        handCam.enabled = true;
+        handCam.targetTexture = rt;
+        handCam.Render();
+        handCam.enabled = false; // deactivate immediately after rendering
+
         iconInstance = new GameObject("ItemIcon");
         iconInstance.transform.SetParent(canvas, false);
 
@@ -67,25 +57,36 @@ public class HoldableItem : MonoBehaviour
 
         RectTransform rtUI = iconInstance.GetComponent<RectTransform>();
         rtUI.sizeDelta = new Vector2(64, 64);
-        rtUI.anchorMin = rtUI.anchorMax = isLeftHand ? new Vector2(0.1f, 0.9f) : new Vector2(0.9f, 0.9f);
+        rtUI.anchorMin = rtUI.anchorMax = isLeftHand ? new Vector2(0.1f, 0.1f) : new Vector2(0.9f, 0.1f);
         rtUI.anchoredPosition = Vector2.zero;
 
         Button btn = iconInstance.AddComponent<Button>();
         btn.onClick.AddListener(Drop);
     }
 
+
+
     public void Drop()
     {
-        if (isLeftHand) { leftHand = null; slot1Texture = null; }
-        else { rightHand = null; slot2Texture = null; }
+        // Clear hand assignment and camera texture
+        if (isLeftHand)
+        {
+            leftHand = null;
+            leftHandCamera.targetTexture = null;
+        }
+        else
+        {
+            rightHand = null;
+            rightHandCamera.targetTexture = null;
+        }
 
         // Remove UI icon
         if (iconInstance != null) Destroy(iconInstance);
 
-        // Restore object in world
+        // Place object back in the world
         gameObject.SetActive(true);
         transform.SetParent(null);
-        transform.position = player.position + player.forward * 1.5f;
-        gameObject.layer = 0; // default layer
+        transform.position = player.position + player.forward * 3f + Vector3.up ;
+        gameObject.layer = 0; // reset layer to default
     }
 }
