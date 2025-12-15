@@ -60,6 +60,11 @@ public class HoldableItem : MonoBehaviour
         rtUI.anchorMin = rtUI.anchorMax = isLeftHand ? new Vector2(0.1f, 0.1f) : new Vector2(0.9f, 0.1f);
         rtUI.anchoredPosition = Vector2.zero;
 
+        CanvasGroup cg = iconInstance.AddComponent<CanvasGroup>();
+
+        UIDragItem drag = iconInstance.AddComponent<UIDragItem>();
+        drag.Init(canvas.GetComponent<Canvas>(), this);
+
         Button btn = iconInstance.AddComponent<Button>();
         btn.onClick.AddListener(Drop);
     }
