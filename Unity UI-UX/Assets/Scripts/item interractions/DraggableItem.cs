@@ -34,7 +34,7 @@ public class UIDragItem : MonoBehaviour,
 
     public void OnDrag(PointerEventData eventData)
     {
-        rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+        rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor * 4;
     }
 
     public void OnEndDrag(PointerEventData eventData)
