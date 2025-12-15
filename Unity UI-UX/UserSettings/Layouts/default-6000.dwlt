@@ -300,8 +300,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Scene\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 320
-    y: 79
+    x: 321
+    y: 24
     width: 1292
     height: 686
   m_SerializedDataModeController:
@@ -676,9 +676,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 16.261965, y: -23.33297, z: 48.04982}
+    m_Target: {x: 7.7627263, y: 3.3039422, z: 17.231752}
     speed: 2
-    m_Value: {x: 16.261965, y: -23.33297, z: 48.04982}
+    m_Value: {x: 7.7627263, y: 3.3039422, z: 17.231752}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -724,13 +724,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.3243061, y: -0.124832265, z: 0.043998808, w: -0.9369919}
+    m_Target: {x: -0.33574378, y: -0.01033707, z: 0.0043795737, w: -0.9422323}
     speed: 2
-    m_Value: {x: -0.3242012, y: -0.12479189, z: 0.043984577, w: -0.93668884}
+    m_Value: {x: -0.33574378, y: -0.01033707, z: 0.0043795733, w: -0.9422323}
   m_Size:
-    m_Target: 23.883976
+    m_Target: 0.9644895
     speed: 2
-    m_Value: 23.883976
+    m_Value: 1.0014882
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -786,7 +786,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 79
+    y: 24
     width: 319
     height: 686
   m_SerializedDataModeController:
@@ -802,9 +802,9 @@ MonoBehaviour:
     m_OverlaysVisible: 1
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 39}
-      m_SelectedIDs: 0edfffff
-      m_LastClickedID: -8434
+      scrollPos: {x: 0, y: 0}
+      m_SelectedIDs: 
+      m_LastClickedID: 0
       m_ExpandedIDs: 4443fffff045ffffc8e0fffffce1ffffdeeaffffbcebffff94ecffff12fbfffffeaa000028ab000072ab00008eab0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
@@ -953,7 +953,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 791
+    y: 736
     width: 1613
     height: 195
   m_SerializedDataModeController:
@@ -978,7 +978,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scripts/RecipesBook
+    - Assets/Scripts
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -997,7 +997,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 65}
     m_SelectedIDs: c8b00000
     m_LastClickedID: 45256
-    m_ExpandedIDs: 00000000ceaf000046b000004cb0000038b3000000ca9a3bffffff7f
+    m_ExpandedIDs: 000000008ab10000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1026,7 +1026,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000ceaf000000ca9a3bffffff7f
+    m_ExpandedIDs: 000000008ab10000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1141,8 +1141,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1614
-    y: 79
+    x: 1615
+    y: 24
     width: 305
     height: 907
   m_SerializedDataModeController:
