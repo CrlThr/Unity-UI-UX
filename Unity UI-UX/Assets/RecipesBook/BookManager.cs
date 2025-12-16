@@ -1,187 +1,188 @@
-using UnityEngine;
 using System.Collections.Generic;
-using TMPro;
+using Unity.VisualScripting;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 
 public class BookManager : MonoBehaviour
 {
-    // --- Data ---
-    public List<RecipeSO> allRecipes;
-    public int recipesPerPage = 4;
-    private int currentPageStartIndex = 0;
+    // --- Paramètres Unity ---
+    [Header("Recipe settings")]
+    [SerializeField] private List<Recipe> recipeList; // La source de données du livre
 
-    // --- References UI - Book Pages ---
-    public GameObject recipeTitlePrefab;
-    public Transform leftPagePanel;
-    public Transform rightPagePanel;
-    public GameObject leftArrow;
-    public GameObject rightArrow;
+    [Header("Pages")]
+    // Références aux deux composants 'Page' dans la scène
+    [SerializeField] private Page LeftPage;
+    [SerializeField] private Page RightPage;
 
-    // --- References UI - Modal Reader (Fusionné) ---
-    [Header("Modal Reader References")]
-    public CanvasGroup readerCanvasGroup;
-    public TextMeshProUGUI readerTitleText;
-    public TextMeshProUGUI readerIngredientsText;
-    public TextMeshProUGUI readerDescriptionText;
+    [Header("UI Components")]
+    [SerializeField] private Button previousPageButton;
+    [SerializeField] private Button nextPageButton;
 
-    // --- References UI - Modal Adder (Fusionné) ---
-    [Header("Modal Adder References")]
-    public CanvasGroup adderCanvasGroup;
-    public TMP_InputField adderTitleInput;
-    public TMP_InputField adderDescriptionInput;
-    public TMP_Dropdown adderIngredientsDropdown;
-    public Transform adderIngredientsListParent;
-    public GameObject ingredientDisplayPrefab;
-    public List<string> possibleIngredients = new List<string> { "Flour", "Eggs", "Milk", "Butter", "Sugar" };
-
-    private List<string> addedIngredients = new List<string>();
+    // --- Variables de Gestion ---
+    private int currentPageIndex = 0;
+    private const int PAGES_PER_VIEW = 2;
 
 
     void Start()
     {
-        // Initial setup for Modal Adder Dropdown
-        adderIngredientsDropdown.ClearOptions();
-        adderIngredientsDropdown.AddOptions(possibleIngredients);
-
-        DisplayPage(0);
-        CloseAllModals();
-    }
-
-
-    public void DisplayPage(int startIndex)
-    {
-        ClearPage(leftPagePanel);
-        ClearPage(rightPagePanel);
-
-        currentPageStartIndex = startIndex;
-        int currentRecipeIndex = startIndex;
-
-        // Display Left Page
-        for (int i = 0; i < recipesPerPage && currentRecipeIndex < allRecipes.Count; i++)
+        // methode pour naviguer 
+        if (nextPageButton != null)
         {
-            InstantiateRecipeTitle(allRecipes[currentRecipeIndex], leftPagePanel);
-            currentRecipeIndex++;
+            nextPageButton.onClick.AddListener(NextRecipe);
+        }
+        if (previousPageButton != null)
+        {
+            previousPageButton.onClick.AddListener(PreviousRecipe);
         }
 
-        // Display Right Page
-        for (int i = 0; i < recipesPerPage && currentRecipeIndex < allRecipes.Count; i++)
+        // 2. Initialiser et afficher le contenu de départ
+        InitializeBookPages();
+        UpdatePageContent();
+    }
+
+    private void InitializeBookPages()
+    {
+        // ancien code 
+        // Page[] existingPages = pagesContainer.GetComponentsInChildren<Page>(true);
+        // LeftPage = existingPages[0];
+        // RightPage = existingPages[1];
+
+        // S'assurer que les pages existent et sont actives au départ
+        if (LeftPage == null || RightPage == null)
         {
-            InstantiateRecipeTitle(allRecipes[currentRecipeIndex], rightPagePanel);
-            currentRecipeIndex++;
+            Debug.LogError("Les références LeftPage et RightPage doivent être assignées dans l'Inspector.");
+            return;
+        }
+        LeftPage.gameObject.SetActive(true);
+        RightPage.gameObject.SetActive(true);
+    }
+
+
+    /// <summary>
+    /// Met à jour le contenu des deux pages 
+    /// </summary>
+    private void UpdatePageContent()
+    {
+        if (recipeList == null || recipeList.Count == 0) return;
+
+        // --- 1. Page de Gauche ---
+        int leftRecipeIndex = currentPageIndex;
+
+        // la page doit tjr exister si on est en page pairs 
+        if (LeftPage != null && leftRecipeIndex < recipeList.Count)
+        {
+            LeftPage.SetPageContent(recipeList[leftRecipeIndex]);
+            LeftPage.gameObject.SetActive(true);
+        }
+         // gérer les pages impairs
+        else if (LeftPage != null)
+        {
+           
+            LeftPage.gameObject.SetActive(false);
         }
 
-        UpdateArrows();
-    }
+        // --- 2. Page de Droite ---
+        int rightRecipeIndex = currentPageIndex + 1;
 
-    private void InstantiateRecipeTitle(RecipeSO recipe, Transform parent)
-    {
-        GameObject titleObj = Instantiate(recipeTitlePrefab, parent);
-        RecipeDisplay display = titleObj.GetComponent<RecipeDisplay>();
-        if (display != null)
+        if (RightPage != null && rightRecipeIndex < recipeList.Count)
         {
-            // Set the manager reference to THIS script (BookManager)
-            display.SetRecipe(this, recipe);
+            // Si la recette suivante existe, on l'affiche à droite
+            RightPage.SetPageContent(recipeList[rightRecipeIndex]);
+            RightPage.gameObject.SetActive(true);
         }
-    }
-
-    private void ClearPage(Transform parent)
-    {
-        while (parent.childCount > 0)
+        else if (RightPage != null)
         {
-            DestroyImmediate(parent.GetChild(0).gameObject);
+            // Si l'index dépasse la liste (cas d'une liste impaire ou fin du livre), 
+            // on cache la page de droite.
+            RightPage.gameObject.SetActive(false);
         }
+        UpdateButtonStates();
     }
 
-    public void NextPage()
+
+    /// <summary>
+    /// Gère la navigation vers la page suivante (avance de 2).
+    /// </summary>
+  
+    public void NextRecipe()
     {
-        int newStart = currentPageStartIndex + (recipesPerPage * 2);
-        if (newStart < allRecipes.Count) DisplayPage(newStart);
-    }
+        int nextPotentialIndex = currentPageIndex + PAGES_PER_VIEW;
 
-    public void PreviousPage()
-    {
-        int newStart = currentPageStartIndex - (recipesPerPage * 2);
-        if (newStart >= 0) DisplayPage(newStart);
-    }
-
-    private void UpdateArrows()
-    {
-        leftArrow.SetActive(currentPageStartIndex > 0);
-        rightArrow.SetActive(currentPageStartIndex + (recipesPerPage * 2) < allRecipes.Count);
-    }
-
-    public void CloseAllModals()
-    {
-        ModalUIHelper.CloseModal(readerCanvasGroup);
-        ModalUIHelper.CloseModal(adderCanvasGroup);
-    }
-
- 
-    public void OpenRecipeReader(RecipeSO recipe)
-    {
-        CloseAllModals(); // Close Adder if it was open
-
-        // 1. Load content
-        readerTitleText.text = recipe.title;
-        readerIngredientsText.text = recipe.GetFormattedIngredients();
-        readerDescriptionText.text = recipe.description;
-
-        // 2. Open Modal
-        ModalUIHelper.OpenModal(readerCanvasGroup);
-    }
-
-    public void OpenAddRecipeModal()
-    {
-        Debug.Log($"Canvas Group status: {adderCanvasGroup != null}");
-        CloseAllModals(); // Close Reader if it was open
-
-        // Cleanup and reset state
-        adderTitleInput.text = "";
-        adderDescriptionInput.text = "";
-        addedIngredients.Clear();
-        ClearIngredientList(adderIngredientsListParent);
-
-        ModalUIHelper.OpenModal(adderCanvasGroup);
-    }
-
-    public void AddIngredientFromDropdown()
-    {
-        string ingredient = adderIngredientsDropdown.options[adderIngredientsDropdown.value].text;
-
-        if (!addedIngredients.Contains(ingredient))
+        // Le tour de page est possible si le nouvel index (page de gauche) est dans la liste.
+        if (nextPotentialIndex < recipeList.Count)
         {
-            addedIngredients.Add(ingredient);
-            DisplayIngredientInList(ingredient);
+            currentPageIndex = nextPotentialIndex;
         }
+        // Cas spécial pour la dernière page impaire (Ex: Count=7, on passe de index 4 à 6).
+        else if (nextPotentialIndex == recipeList.Count && recipeList.Count % 2 != 0)
+        {
+            // On saute de l'avant-dernière double page (index N-3) à la toute dernière recette (index N-1).
+            // Le nouvel index doit être recipeList.Count - 1 (l'index de la dernière recette).
+            currentPageIndex = recipeList.Count - 1;
+        }
+        else
+        {
+            // Ne rien faire si on est déjà à la fin
+            return;
+        }
+
+        UpdatePageContent();
     }
 
-    private void DisplayIngredientInList(string ingredient)
+    /// <summary>
+    /// Gère la navigation vers la page précédente (recule de 2).
+    /// </summary>
+    public void PreviousRecipe()
     {
-        GameObject ingredientObj = Instantiate(ingredientDisplayPrefab, adderIngredientsListParent);
-        TextMeshProUGUI tmp = ingredientObj.GetComponent<TextMeshProUGUI>();
-        if (tmp != null) tmp.text = $"- {ingredient}";
+        int previousPotentialIndex = currentPageIndex - PAGES_PER_VIEW;
+
+        if (previousPotentialIndex >= 0)
+        {
+            // Le retour de page est standard
+            currentPageIndex = previousPotentialIndex;
+        }
+        else if (currentPageIndex != 0)
+        {
+            // Si l'index est 1, on veut revenir à 0 (début du livre)
+            currentPageIndex = 0;
+        }
+        else
+        {
+            // Ne rien faire si on est déjà au début
+            return;
+        }
+
+        UpdatePageContent();
     }
 
-    private void ClearIngredientList(Transform parent)
+
+    /// <summary>
+    /// Active/Désactive les boutons de navigation.
+    /// </summary>
+    private void UpdateButtonStates()
     {
-        while (parent.childCount > 0) Destroy(parent.GetChild(0).gameObject);
-    }
+        if (recipeList == null || recipeList.Count == 0) return;
 
-    public void SaveNewRecipe()
-    {
-        if (string.IsNullOrEmpty(adderTitleInput.text)) return;
+        // --- État du bouton 'Précédent' ---
+        // Le bouton est interactif si l'index actuel n'est pas 0 (le début).
+        if (previousPageButton != null)
+        {
+            previousPageButton.interactable = (currentPageIndex > 0);
+        }
 
-        RecipeSO newRecipe = ScriptableObject.CreateInstance<RecipeSO>();
-        newRecipe.title = adderTitleInput.text;
-        newRecipe.ingredients = addedIngredients.ToList();
-        newRecipe.description = adderDescriptionInput.text;
+        // --- État du bouton 'Suivant' ---
+        if (nextPageButton != null)
+        {
+            // Le bouton 'Suivant' est interactif si :
+            // 1. Le prochain tour de page (index + 2) est dans les limites de la liste.
+            // 2. OU si c'est le cas de la dernière page impaire (index + 2 mène exactement à la fin de la liste).
 
-        allRecipes.Add(newRecipe);
+            int nextIndex = currentPageIndex + PAGES_PER_VIEW;
 
-        // Refresh display to show the new recipe
-        DisplayPage(currentPageStartIndex);
+            bool canTurn = (nextIndex <= recipeList.Count - 1)
+                           || (nextIndex == recipeList.Count && recipeList.Count % 2 != 0);
 
-        CloseAllModals();
+            nextPageButton.interactable = canTurn;
+        }
     }
 }
