@@ -1258,9 +1258,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Left
-
-'
+  m_text: <
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1287,8 +1285,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2624,18 +2622,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   recipeList:
   - recipeName: 'Hamburger '
-    ingredients: "* pain \n* steak\n* fromage\n* salade/tomate/oignions"
-    instructions: "- mettre de c\xF4t\xE9 le pain, le fromage, la salade et les tomates\n-
-      cuire le steak et les ognions\n-assembler le tout"
+    ingredients: "* Pain \n* Steak\n* Fromage\n* salade/tomate/oignions"
+    instructions: "- Mettre de c\xF4t\xE9 le pain, le fromage, la salade et les tomates\n-
+      Cuire le steak et les ognions\n- Assembler le tout"
   - recipeName: Salade
-    ingredients: "- Salade\n- Melon\n- Past\xE8ques\n- Tomate\n- Carotte\n- Aubergine"
+    ingredients: "- Salade\n- Melon\n- Past\xE8ques\n- Tomate\n- Concombre\n- Aubergine"
     instructions: Melanger le tout dans un saladier
-  - recipeName: 3
-    ingredients: 3
-    instructions: 3
-  - recipeName: 4
-    ingredients: 4
-    instructions: 4
+  - recipeName: Pop corn (maison)
+    ingredients: "- Ma\xEFs\n"
+    instructions: "- faire cuire le ma\xEFs\n- Mettre le pop corn dans un bol ou
+      un saladier\n"
+  - recipeName: '"Fish and Chips" '
+    ingredients: '- Frite
+
+      - Poisson'
+    instructions: '- Faire cuire les deux aliments
+
+      - Ajouter le tout ensemble '
+  - recipeName: Hot Dog
+    ingredients: '- Pain
+
+      - Saucisse
+
+      - Fromage'
+    instructions: '- Cuire la saucisse
+
+      - Ajouter tout dans le pain '
   LeftPage: {fileID: 1024073183}
   RightPage: {fileID: 1674319537}
   previousPageButton: {fileID: 789981412}
@@ -4039,8 +4051,8 @@ GameObject:
   - component: {fileID: 789981415}
   - component: {fileID: 777077981}
   - component: {fileID: 789981414}
-  - component: {fileID: 789981412}
   - component: {fileID: 789981413}
+  - component: {fileID: 789981412}
   m_Layer: 5
   m_Name: PreviousPage
   m_TagString: Untagged
@@ -5712,9 +5724,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Right
-
-'
+  m_text: '>'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5741,8 +5751,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 30
+  m_fontSizeBase: 30
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

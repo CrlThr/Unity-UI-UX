@@ -20,7 +20,7 @@ public class BookManager : MonoBehaviour
 
     // --- Variables de Gestion ---
     private int currentPageIndex = 0;
-    private const int PAGES_PER_VIEW = 2;
+    private const int PagesPerView = 2;
 
 
     void Start()
@@ -63,23 +63,24 @@ public class BookManager : MonoBehaviour
     /// </summary>
     private void UpdatePageContent()
     {
-        if (recipeList == null || recipeList.Count == 0) return;
+        //if (recipeList == null || recipeList.Count == 0)
+        //{
+        //    // Désactiver les pages si la liste est vide
+        //    if (LeftPage != null) LeftPage.gameObject.SetActive(false);
+        //    if (RightPage != null) RightPage.gameObject.SetActive(false);
+        //    return;
+        //}
 
         // --- 1. Page de Gauche ---
         int leftRecipeIndex = currentPageIndex;
 
-        // la page doit tjr exister si on est en page pairs 
-        if (LeftPage != null && leftRecipeIndex < recipeList.Count)
+        // doit toujours etre valide et affiché 
+        if (LeftPage != null)
         {
-            LeftPage.SetPageContent(recipeList[leftRecipeIndex]);
             LeftPage.gameObject.SetActive(true);
+            LeftPage.SetPageContent(recipeList[leftRecipeIndex]);
         }
-         // gérer les pages impairs
-        else if (LeftPage != null)
-        {
-           
-            LeftPage.gameObject.SetActive(false);
-        }
+     
 
         // --- 2. Page de Droite ---
         int rightRecipeIndex = currentPageIndex + 1;
@@ -90,11 +91,10 @@ public class BookManager : MonoBehaviour
             RightPage.SetPageContent(recipeList[rightRecipeIndex]);
             RightPage.gameObject.SetActive(true);
         }
-        else if (RightPage != null)
-        {
-            // Si l'index dépasse la liste (cas d'une liste impaire ou fin du livre), 
-            // on cache la page de droite.
+        else if (RightPage != null) {
+            RightPage.SetPageContent(null);
             RightPage.gameObject.SetActive(false);
+
         }
         UpdateButtonStates();
     }
@@ -106,27 +106,19 @@ public class BookManager : MonoBehaviour
   
     public void NextRecipe()
     {
-        int nextPotentialIndex = currentPageIndex + PAGES_PER_VIEW;
+        int nextIndex = currentPageIndex + PagesPerView; 
+        int LastValidIndex = recipeList.Count - 1;  // on check si l'index est valide au départ
 
-        // Le tour de page est possible si le nouvel index (page de gauche) est dans la liste.
-        if (nextPotentialIndex < recipeList.Count)
+        if (nextIndex <= LastValidIndex)
         {
-            currentPageIndex = nextPotentialIndex;
-        }
-        // Cas spécial pour la dernière page impaire (Ex: Count=7, on passe de index 4 à 6).
-        else if (nextPotentialIndex == recipeList.Count && recipeList.Count % 2 != 0)
-        {
-            // On saute de l'avant-dernière double page (index N-3) à la toute dernière recette (index N-1).
-            // Le nouvel index doit être recipeList.Count - 1 (l'index de la dernière recette).
-            currentPageIndex = recipeList.Count - 1;
+            currentPageIndex = nextIndex;
+            UpdatePageContent();
         }
         else
-        {
+        { 
             // Ne rien faire si on est déjà à la fin
             return;
         }
-
-        UpdatePageContent();
     }
 
     /// <summary>
@@ -134,25 +126,25 @@ public class BookManager : MonoBehaviour
     /// </summary>
     public void PreviousRecipe()
     {
-        int previousPotentialIndex = currentPageIndex - PAGES_PER_VIEW;
+        int previousPotentialIndex = currentPageIndex - PagesPerView;
 
         if (previousPotentialIndex >= 0)
         {
             // Le retour de page est standard
             currentPageIndex = previousPotentialIndex;
+            UpdatePageContent();
         }
         else if (currentPageIndex != 0)
         {
             // Si l'index est 1, on veut revenir à 0 (début du livre)
             currentPageIndex = 0;
+            UpdatePageContent();
         }
         else
         {
             // Ne rien faire si on est déjà au début
             return;
         }
-
-        UpdatePageContent();
     }
 
 
@@ -173,16 +165,13 @@ public class BookManager : MonoBehaviour
         // --- État du bouton 'Suivant' ---
         if (nextPageButton != null)
         {
-            // Le bouton 'Suivant' est interactif si :
-            // 1. Le prochain tour de page (index + 2) est dans les limites de la liste.
-            // 2. OU si c'est le cas de la dernière page impaire (index + 2 mène exactement à la fin de la liste).
+            int totalRecipes = recipeList.Count;
 
-            int nextIndex = currentPageIndex + PAGES_PER_VIEW;
+            int lastPageIndex = totalRecipes - 1;
 
-            bool canTurn = (nextIndex <= recipeList.Count - 1)
-                           || (nextIndex == recipeList.Count && recipeList.Count % 2 != 0);
+            int nextIndex = currentPageIndex + PagesPerView;
 
-            nextPageButton.interactable = canTurn;
+            nextPageButton.interactable = (nextIndex <= lastPageIndex);
         }
     }
 }
