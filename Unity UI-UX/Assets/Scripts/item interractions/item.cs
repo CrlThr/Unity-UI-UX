@@ -4,6 +4,14 @@ using UnityEngine.UI;
 
 public class HoldableItem : MonoBehaviour
 {
+
+    public enum CookState
+    {
+        Raw,
+        Cooked,
+        Overcooked
+    }
+
     public static HoldableItem leftHand;
     public static HoldableItem rightHand;
 
@@ -13,8 +21,22 @@ public class HoldableItem : MonoBehaviour
     public Camera leftHandCamera;
     public Camera rightHandCamera;
 
+    public bool isInSlot = false;
     private static RenderTexture slot1Texture;
     private static RenderTexture slot2Texture;
+
+    public CookState cookState = CookState.Raw;
+
+    [SerializeField] GameObject cuissonItem1;
+    [SerializeField] GameObject cuissonItem2;
+
+    [SerializeField] float cookTime;
+
+    public float CookTime => cookTime;
+    public GameObject CuissonItem1 => cuissonItem1;
+    public GameObject CuissonItem2 => cuissonItem2;
+
+
 
     private Transform player;
 
@@ -28,6 +50,9 @@ public class HoldableItem : MonoBehaviour
 
     public void Pickup(Transform playerTransform, Transform canvas)
     {
+        if (iconInstance != null)
+            Destroy(iconInstance);
+
         player = playerTransform;
 
         if (leftHand == null) { leftHand = this; isLeftHand = true; }
@@ -41,7 +66,7 @@ public class HoldableItem : MonoBehaviour
 
         SetLayerRecursively(transform, LayerMask.NameToLayer("ItemIcon"));
 
-        transform.position = handCam.transform.position + handCam.transform.forward * 2f;
+        transform.position = handCam.transform.position + handCam.transform.forward * 3f;
         transform.rotation = Quaternion.identity;
 
         handCam.enabled = true;
@@ -66,10 +91,35 @@ public class HoldableItem : MonoBehaviour
         drag.Init(canvas.GetComponent<Canvas>(), this);
 
         Button btn = iconInstance.AddComponent<Button>();
-        btn.onClick.AddListener(Drop);
+        btn.onClick.RemoveAllListeners();
+        btn.onClick.AddListener(() =>
+        {
+            if (isInSlot)
+                PickupFromSlot(canvas, player);
+            else
+                Drop();
+        });
+
+    }
+
+    public bool CanBeCooked()
+    {
+        return cookState == CookState.Raw;
     }
 
 
+    public void ReplaceWith(GameObject newPrefab)
+    {
+        // Destroy old visuals
+        foreach (Transform child in transform)
+            Destroy(child.gameObject);
+
+        // Instantiate new visuals as child
+        GameObject newVisual = Instantiate(newPrefab, transform);
+        newVisual.transform.localPosition = Vector3.zero;
+        newVisual.transform.localRotation = Quaternion.identity;
+
+    }
 
     public void Drop()
     {
@@ -94,4 +144,38 @@ public class HoldableItem : MonoBehaviour
         transform.position = player.position + player.forward * 3f + Vector3.up ;
         gameObject.layer = 0; // reset layer to default
     }
+
+    public void ReleaseHand()
+    {
+        if (isLeftHand && leftHand == this)
+        {
+            leftHand = null;
+            leftHandCamera.targetTexture = null;
+        }
+        else if (!isLeftHand && rightHand == this)
+        {
+            rightHand = null;
+            rightHandCamera.targetTexture = null;
+        }
+    }
+
+    public void PickupFromSlot(Transform canvas, Transform playerTransform)
+    {
+        if (leftHand != null && rightHand != null)
+        {
+            Debug.Log("No free hand");
+            return;
+        }
+
+        // Supprimer l'icône du slot
+        if (iconInstance != null)
+            Destroy(iconInstance);
+
+        isInSlot = false;
+
+        // Reprendre normalement
+        Pickup(playerTransform, canvas);
+    }
+
+
 }
