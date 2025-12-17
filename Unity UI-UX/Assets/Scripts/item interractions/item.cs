@@ -183,41 +183,40 @@ public class HoldableItem : MonoBehaviour
 
     public void ReplaceWith(GameObject newPrefab)
     {
-        if (newPrefab == null)
-        {
-            Debug.LogError($"[{name}] ReplaceWith failed: prefab is NULL", this);
-            return;
-        }
+        if (newPrefab == null || currentVisual == null) return;
 
-        if (currentVisual == null)
-        {
-            Debug.LogError($"[{name}] currentVisual is NULL — RAW mesh not registered!", this);
-            return;
-        }
+        MeshFilter newMF = newPrefab.GetComponent<MeshFilter>();
+        MeshRenderer newMR = newPrefab.GetComponent<MeshRenderer>();
 
-        Bounds oldBounds = GetCombinedBounds(currentVisual);
+        MeshFilter currentMF = currentVisual.GetComponent<MeshFilter>();
+        MeshRenderer currentMR = currentVisual.GetComponent<MeshRenderer>();
 
-        Destroy(currentVisual);
+        if (currentMF != null && newMF != null)
+            currentMF.mesh = newMF.sharedMesh;
 
-        currentVisual = Instantiate(newPrefab, transform);
+        if (currentMR != null && newMR != null)
+            currentMR.materials = newMR.sharedMaterials;
 
-        SetActiveRecursively(currentVisual.transform, true);
-        SetLayerRecursively(currentVisual.transform, gameObject.layer);
-
+        // Keep the visual relative to the root
+        currentVisual.transform.localPosition = Vector3.zero;
         currentVisual.transform.localRotation = Quaternion.identity;
         currentVisual.transform.localScale = Vector3.one;
 
-        Bounds newBounds = GetCombinedBounds(currentVisual);
-        float yOffset = oldBounds.min.y - newBounds.min.y;
+        // Calculate vertical offset based on mesh bounds (local space)
+        Bounds rootBounds = GetCombinedBounds(gameObject); // root HoldableItem
+        Bounds visualBounds = GetCombinedBounds(currentVisual);
+        float yOffset = rootBounds.min.y - visualBounds.min.y;
+        currentVisual.transform.localPosition += Vector3.up * yOffset;
 
-        currentVisual.transform.position += Vector3.up * yOffset;
+        SetActiveRecursively(currentVisual.transform, true);
+        SetLayerRecursively(currentVisual.transform, gameObject.layer);
     }
 
     private Bounds GetCombinedBounds(GameObject obj)
     {
         Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
         if (renderers.Length == 0)
-            return new Bounds(obj.transform.position, Vector3.zero);
+            return new Bounds(Vector3.zero, Vector3.zero);
 
         Bounds bounds = renderers[0].bounds;
         for (int i = 1; i < renderers.Length; i++)
@@ -225,6 +224,7 @@ public class HoldableItem : MonoBehaviour
 
         return bounds;
     }
+
 
     #endregion
 

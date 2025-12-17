@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class CookingSlot : MonoBehaviour
@@ -7,24 +7,33 @@ public class CookingSlot : MonoBehaviour
 
     private HoldableItem currentItem;
     private Coroutine cookRoutine;
+    public float slotHeightOffset = 0.5f; 
+
 
     // Start cooking an item in this slot
     public void StartCooking(HoldableItem item)
     {
-        if (item == null) return; // Safety check
-        if (currentItem != null) return;
+        if (item == null || currentItem != null) return;
 
         currentItem = item;
         item.isInSlot = true;
 
-        // Move item to slot
-        item.transform.position = itemPoint.position + Vector3.up * 1.5f;
-        item.UnfreezePhysics();
+        // Release from hand if it's held
+        item.ReleaseHand();
 
-        // Only cook if raw
+        // Move item root to slot
+        item.transform.SetParent(null); // detach from hand
+        item.transform.position = itemPoint.position + Vector3.up * slotHeightOffset;
+        item.transform.rotation = Quaternion.identity;
+
+        // Freeze physics so it stays on the slot
+        item.FreezePhysics();
+
+        // Start cooking if raw
         if (item.CanBeCooked())
             cookRoutine = StartCoroutine(CookProcess(item));
     }
+
 
     private IEnumerator CookProcess(HoldableItem item)
     {
