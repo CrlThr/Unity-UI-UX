@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 
+
 /// <summary>
 /// Contrôleur de l'affichage d'une seule page de livre. 
 /// Il met à jour les composants UI avec les données de la recette fournie.
@@ -13,35 +14,42 @@ public class Page : MonoBehaviour
     [SerializeField] private TextMeshProUGUI ingredientsText;
     [SerializeField] private TextMeshProUGUI instructionsText;
 
+    [Header("PopUp")]
+
+    [SerializeField] private RecipeLink titleLink;
+    [SerializeField] private RecipePopup popupManager;
+
 
     /// <summary>
     /// Met à jour l'affichage de la page avec les données d'une recette.
     /// </summary>
     /// <param name="recipe">La recette à afficher.</param>
-  
+
 
     public void SetPageContent(Recipe recipe)
     {
-        // Vérification de base pour s'assurer que les références UI sont définies
-        if (titleText == null || ingredientsText == null || instructionsText == null)
-        {
-            Debug.LogError("Les composants Text UI ne sont pas tous liés dans le script Page!", this);
-            return;
-        }
-
         if (recipe == null)
         {
-            // Si aucune recette n'est fournie (par exemple, dernière page impaire), on vide le contenu
-            titleText.text = "Page Vide";
+            titleText.text = "";
+            // On vide les autres textes sur le livre
             ingredientsText.text = "";
             instructionsText.text = "";
+            if (titleLink != null) titleLink.currentRecipe = null;
         }
         else
         {
-            // Afficher les données de la recette
+            // On affiche que le titre 
             titleText.text = recipe.Name;
-            ingredientsText.text = "Ingrédients :\n" + recipe.Ingredients;
-            instructionsText.text = "Instructions :\n" + recipe.Instructions;
+
+            // On laisse les autres textes vides sur le livre
+            ingredientsText.text = "";
+            instructionsText.text = "";
+
+            if (titleLink != null)
+            {
+                titleLink.currentRecipe = recipe;
+                titleLink.popupSystem = popupManager;
+            }
         }
     }
 }

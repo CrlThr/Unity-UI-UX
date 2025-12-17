@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class BookManager : MonoBehaviour
@@ -26,14 +27,16 @@ public class BookManager : MonoBehaviour
     void Start()
     {
         // methode pour naviguer 
-        if (nextPageButton != null)
-        {
-            nextPageButton.onClick.AddListener(NextRecipe);
-        }
-        if (previousPageButton != null)
-        {
-            previousPageButton.onClick.AddListener(PreviousRecipe);
-        }
+        //if (nextPageButton != null)
+        //{
+        //    if (Mouse.current.leftButton.wasPressedThisFrame)
+        //        nextPageButton.onClick.AddListener(NextRecipe);
+        //}
+        //if (previousPageButton != null)
+        //{
+        //    if (Mouse.current.leftButton.wasPressedThisFrame)
+        //        previousPageButton.onClick.AddListener(PreviousRecipe);
+        //}
 
         // 2. Initialiser et afficher le contenu de départ
         InitializeBookPages();
