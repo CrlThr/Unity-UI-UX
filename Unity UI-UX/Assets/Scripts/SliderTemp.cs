@@ -4,17 +4,22 @@ using UnityEngine.UI;
 
 public class SliderTemp : MonoBehaviour
 {
-
     [SerializeField] private Slider slider;
     [SerializeField] private TextMeshProUGUI sliderText;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    private void Start()
     {
-        slider.onValueChanged.AddListener((v) =>
-        {
-            sliderText.text = v.ToString("0");
-            sliderText.text += " °C";
-        });
+        
+        UpdateTemperature(slider.value);
+
+        slider.onValueChanged.AddListener(UpdateTemperature);
     }
 
+    void UpdateTemperature(float value)
+    {
+        sliderText.text = value.ToString("0") + " °C";
+
+        if (TemperatureManager.Instance != null)
+            TemperatureManager.Instance.temperature = value;
+    }
 }

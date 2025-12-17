@@ -9,35 +9,51 @@ public class Cook : MonoBehaviour
     [SerializeField] Camera mainCam;
     public float interactRange = 10f;
 
-    public GameObject hoverPanel; //pannel faisant comprendre au joueur qu'il peut utiliser le four / à detruire apres la premiere utilisation (le premierclick sur un element de cookinghob
+    public GameObject hoverPanel;
     public TMP_Text hoverText;
 
-    public GameObject cookingPanel; //panel contenant les slots d'ingrediens
+    public GameObject cookingPanel;
 
-    public GameObject ingredient1Panel; //slots ou les preview d'ingredient sont mises apres y avoir drag and drop
+    public GameObject ingredient1Panel;
     public GameObject ingredient2Panel;
     public GameObject ingredient3Panel;
     public GameObject ingredient4Panel;
 
-    [SerializeField] private CookingSlot[] cookingSlots; 
+    [SerializeField] private CookingSlot[] cookingSlots;
 
     private bool isHoveringOven;
+    private bool hasUsedOven = false; // prevents hover panel after first use
 
+    private void Start()
+    {
+        cookingPanel.SetActive(false);
+    }
 
-    void Update()
+    private void Update()
     {
         InterractOven();
 
         if (isHoveringOven && Mouse.current.leftButton.wasPressedThisFrame)
         {
+            if (!hasUsedOven)
+            {
+                hasUsedOven = true; // disable hover panel forever
+            }
+
             hoverPanel.SetActive(false);
             cookingPanel.SetActive(true);
         }
     }
 
-
     public void InterractOven()
     {
+        if (hasUsedOven)
+        {
+            hoverPanel.SetActive(false);
+            isHoveringOven = false;
+            return;
+        }
+
         isHoveringOven = false;
         if (Mouse.current == null) return;
 
@@ -64,14 +80,7 @@ public class Cook : MonoBehaviour
 
     public void StartCooking()
     {
-        GameObject[] panels =
-        {
-        ingredient1Panel,
-        ingredient2Panel,
-        ingredient3Panel,
-        ingredient4Panel
-    };
-
+        GameObject[] panels = { ingredient1Panel, ingredient2Panel, ingredient3Panel, ingredient4Panel };
         int slotIndex = 0;
 
         foreach (GameObject panel in panels)
@@ -79,28 +88,25 @@ public class Cook : MonoBehaviour
             if (panel.transform.childCount == 0)
                 continue;
 
-            HoldableItem item =
-                panel.GetComponentInChildren<UIDragItem>()?.linkedItem;
+            HoldableItem item = panel.GetComponentInChildren<UIDragItem>()?.linkedItem;
 
-            if (item == null)
+            if (item == null || !item.CanBeCooked())
                 continue;
 
             if (slotIndex >= cookingSlots.Length)
                 break;
 
-            if (!item.CanBeCooked())
-                continue;
+            // Remove UI icon safely
+            if (item.iconInstance != null)
+            {
+                Destroy(item.iconInstance);
+                item.iconInstance = null;
+            }
 
-            // Remove UI icon
-            Destroy(item.iconInstance);
             item.isInSlot = false;
-            item.iconInstance = null;
 
             cookingSlots[slotIndex].StartCooking(item);
             slotIndex++;
         }
     }
-
-
-
 }

@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using static HoldableItem;
 
 public class CookingSlot : MonoBehaviour
 {
@@ -9,34 +8,63 @@ public class CookingSlot : MonoBehaviour
     private HoldableItem currentItem;
     private Coroutine cookRoutine;
 
+    // Start cooking an item in this slot
     public void StartCooking(HoldableItem item)
     {
+        if (item == null) return; // Safety check
         if (currentItem != null) return;
-        if (!item.CanBeCooked()) return;
 
         currentItem = item;
+        item.isInSlot = true;
 
-        item.isInSlot = false;
-        item.transform.position = itemPoint.position;
-        item.gameObject.SetActive(true);
+        // Move item to slot
+        item.transform.position = itemPoint.position + Vector3.up * 1.5f;
+        item.UnfreezePhysics();
 
-        cookRoutine = StartCoroutine(CookProcess(item));
+        // Only cook if raw
+        if (item.CanBeCooked())
+            cookRoutine = StartCoroutine(CookProcess(item));
     }
 
-    IEnumerator CookProcess(HoldableItem item)
+    private IEnumerator CookProcess(HoldableItem item)
     {
-        yield return new WaitForSeconds(item.CookTime);
+        float cookedTimer = 0f;
+        float overcookTimer = 0f;
 
-        item.cookState = CookState.Cooked;
-        item.ReplaceWith(item.CuissonItem1); // <- no assignment
+        while (item != null && currentItem == item)
+        {
+            float multiplier = TemperatureManager.Instance.GetCookingMultiplier();
 
-        yield return new WaitForSeconds(5f);
+            if (multiplier > 0f)
+            {
+                // Cooking raw item
+                if (item.cookState == HoldableItem.CookState.Raw)
+                {
+                    cookedTimer += Time.deltaTime * multiplier;
+                    if (cookedTimer >= item.CookTime)
+                    {
+                        item.cookState = HoldableItem.CookState.Cooked;
+                        item.ReplaceWith(item.CuissonItem1);
+                    }
+                }
+                // Overcooking
+                else if (item.cookState == HoldableItem.CookState.Cooked)
+                {
+                    overcookTimer += Time.deltaTime * multiplier;
+                    if (overcookTimer >= 5f)
+                    {
+                        item.cookState = HoldableItem.CookState.Overcooked;
+                        item.ReplaceWith(item.CuissonItem2);
+                        yield break;
+                    }
+                }
+            }
 
-        item.cookState = CookState.Overcooked;
-        item.ReplaceWith(item.CuissonItem2); // <- no assignment
+            yield return null; // wait for next frame
+        }
     }
 
-
+    // Remove item from slot safely
     public void RemoveItem()
     {
         if (cookRoutine != null)
@@ -44,6 +72,9 @@ public class CookingSlot : MonoBehaviour
             StopCoroutine(cookRoutine);
             cookRoutine = null;
         }
+
+        if (currentItem != null)
+            currentItem.isInSlot = false;
 
         currentItem = null;
     }
