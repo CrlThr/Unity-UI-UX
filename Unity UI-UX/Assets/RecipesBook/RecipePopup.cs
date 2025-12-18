@@ -18,8 +18,8 @@ public class RecipePopup : MonoBehaviour
     public void ShowPopup(Recipe recipe)
     {
         titleText.text = recipe.Name;
-        contentText.text = "INGRÉDIENTS :\n" + recipe.Ingredients +
-                           "\n\nINSTRUCTIONS :\n" + recipe.Instructions;
+        contentText.text = recipe.Content;
+                           
 
         // affichage via le canvas group 
         canvasGroup.alpha = 1f;

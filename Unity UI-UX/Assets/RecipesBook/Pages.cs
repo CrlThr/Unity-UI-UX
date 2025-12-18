@@ -11,8 +11,8 @@ public class Page : MonoBehaviour
     [Header("Références UI")]
     
     [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI ingredientsText;
-    [SerializeField] private TextMeshProUGUI instructionsText;
+    [SerializeField] private TextMeshProUGUI contentText;
+    
 
     [Header("PopUp")]
 
@@ -32,8 +32,7 @@ public class Page : MonoBehaviour
         {
             titleText.text = "";
             // On vide les autres textes sur le livre
-            ingredientsText.text = "";
-            instructionsText.text = "";
+            contentText.text = "";
             if (titleLink != null) titleLink.currentRecipe = null;
         }
         else
@@ -42,8 +41,7 @@ public class Page : MonoBehaviour
             titleText.text = recipe.Name;
 
             // On laisse les autres textes vides sur le livre
-            ingredientsText.text = "";
-            instructionsText.text = "";
+            contentText.text = "";
 
             if (titleLink != null)
             {

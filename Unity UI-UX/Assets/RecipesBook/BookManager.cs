@@ -6,38 +6,25 @@ using UnityEngine.UI;
 
 public class BookManager : MonoBehaviour
 {
-    // --- Paramètres Unity ---
-    [Header("Recipe settings")]
-    [SerializeField] private List<Recipe> recipeList; // La source de données du livre
+    
+    [Header("Paramètres recettes")]
+    [SerializeField] public List<Recipe> recipeList; // La source de données du livre
+    public List<Recipe> allRecipes = new List<Recipe>();
 
     [Header("Pages")]
-    // Références aux deux composants 'Page' dans la scène
     [SerializeField] private Page LeftPage;
     [SerializeField] private Page RightPage;
 
-    [Header("UI Components")]
+    [Header("UI Reference")]
     [SerializeField] private Button previousPageButton;
     [SerializeField] private Button nextPageButton;
 
-    // --- Variables de Gestion ---
+   
     private int currentPageIndex = 0;
     private const int PagesPerView = 2;
 
-
     void Start()
     {
-        // methode pour naviguer 
-        //if (nextPageButton != null)
-        //{
-        //    if (Mouse.current.leftButton.wasPressedThisFrame)
-        //        nextPageButton.onClick.AddListener(NextRecipe);
-        //}
-        //if (previousPageButton != null)
-        //{
-        //    if (Mouse.current.leftButton.wasPressedThisFrame)
-        //        previousPageButton.onClick.AddListener(PreviousRecipe);
-        //}
-
         // 2. Initialiser et afficher le contenu de départ
         InitializeBookPages();
         UpdatePageContent();
@@ -45,11 +32,6 @@ public class BookManager : MonoBehaviour
 
     private void InitializeBookPages()
     {
-        // ancien code 
-        // Page[] existingPages = pagesContainer.GetComponentsInChildren<Page>(true);
-        // LeftPage = existingPages[0];
-        // RightPage = existingPages[1];
-
         // S'assurer que les pages existent et sont actives au départ
         if (LeftPage == null || RightPage == null)
         {
@@ -64,16 +46,8 @@ public class BookManager : MonoBehaviour
     /// <summary>
     /// Met à jour le contenu des deux pages 
     /// </summary>
-    private void UpdatePageContent()
+    public void UpdatePageContent()
     {
-        //if (recipeList == null || recipeList.Count == 0)
-        //{
-        //    // Désactiver les pages si la liste est vide
-        //    if (LeftPage != null) LeftPage.gameObject.SetActive(false);
-        //    if (RightPage != null) RightPage.gameObject.SetActive(false);
-        //    return;
-        //}
-
         // --- 1. Page de Gauche ---
         int leftRecipeIndex = currentPageIndex;
 
@@ -84,7 +58,6 @@ public class BookManager : MonoBehaviour
             LeftPage.SetPageContent(recipeList[leftRecipeIndex]);
         }
      
-
         // --- 2. Page de Droite ---
         int rightRecipeIndex = currentPageIndex + 1;
 
