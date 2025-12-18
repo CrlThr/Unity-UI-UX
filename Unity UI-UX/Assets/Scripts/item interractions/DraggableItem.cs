@@ -34,7 +34,7 @@ public class UIDragItem : MonoBehaviour,
 
     public void OnDrag(PointerEventData eventData)
     {
-        rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+       rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -45,15 +45,26 @@ public class UIDragItem : MonoBehaviour,
 
         if (slot != null && slot.CompareTag("CookingSlot"))
         {
-            // Stick item to cooking panel
+            // Libérer la main
+            linkedItem.ReleaseHand();
+            linkedItem.isInSlot = true;
+
+            // Attacher au slot
             transform.SetParent(slot.transform, false);
-            rectTransform.anchoredPosition = Vector2.zero;
+
+            // Remplir tout le panel
+            RectTransform slotRT = slot.GetComponent<RectTransform>();
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.one;
+            rectTransform.offsetMin = Vector2.zero;
+            rectTransform.offsetMax = Vector2.zero;
         }
         else
         {
-            // Return to inventory
+            // Retour inventaire
             transform.SetParent(originalParent, false);
             rectTransform.anchoredPosition = originalPos;
         }
     }
+
 }

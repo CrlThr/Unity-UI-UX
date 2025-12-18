@@ -4,6 +4,15 @@ using UnityEngine.UI;
 
 public class HoldableItem : MonoBehaviour
 {
+    private GameObject currentVisual;
+
+    public enum CookState
+    {
+        Raw,
+        Cooked,
+        Overcooked
+    }
+
     public static HoldableItem leftHand;
     public static HoldableItem rightHand;
 
@@ -13,21 +22,53 @@ public class HoldableItem : MonoBehaviour
     public Camera leftHandCamera;
     public Camera rightHandCamera;
 
+    public bool isInSlot = false;
     private static RenderTexture slot1Texture;
     private static RenderTexture slot2Texture;
 
+    private Rigidbody rb;
+    private bool frozenBySlot;
+
+    public CookState cookState = CookState.Raw;
+
+    [SerializeField] GameObject cuissonItem1;
+    [SerializeField] GameObject cuissonItem2;
+    [SerializeField] float cookTime;
+
+    public float CookTime => cookTime;
+    public GameObject CuissonItem1 => cuissonItem1;
+    public GameObject CuissonItem2 => cuissonItem2;
+
     private Transform player;
 
-    // Utility function to set layer for object and all children
-    private void SetLayerRecursively(Transform obj, int layer)
+    void Awake()
     {
-        obj.gameObject.layer = layer;
-        foreach (Transform child in obj)
-            SetLayerRecursively(child, layer);
+        rb = GetComponent<Rigidbody>();
+
+        // 🔴 CRITICAL FIX:
+        // Register the RAW mesh already present in the scene
+        if (currentVisual == null)
+        {
+            Renderer r = GetComponentInChildren<Renderer>();
+            if (r != null)
+            {
+                currentVisual = r.gameObject;
+            }
+            else
+            {
+                Debug.LogError($"[{name}] No Renderer found for RAW visual!", this);
+            }
+        }
     }
+
+    #region PICKUP / DROP
 
     public void Pickup(Transform playerTransform, Transform canvas)
     {
+        if (iconInstance != null)
+            Destroy(iconInstance);
+
+        UnfreezePhysics();
         player = playerTransform;
 
         if (leftHand == null) { leftHand = this; isLeftHand = true; }
@@ -35,19 +76,20 @@ public class HoldableItem : MonoBehaviour
         else { Debug.Log("Both hands full"); return; }
 
         Camera handCam = isLeftHand ? leftHandCamera : rightHandCamera;
+
         RenderTexture rt = new RenderTexture(256, 256, 16);
         if (isLeftHand) slot1Texture = rt;
         else slot2Texture = rt;
 
         SetLayerRecursively(transform, LayerMask.NameToLayer("ItemIcon"));
 
-        transform.position = handCam.transform.position + handCam.transform.forward * 2f;
+        transform.position = handCam.transform.position + handCam.transform.forward * 3f;
         transform.rotation = Quaternion.identity;
 
         handCam.enabled = true;
         handCam.targetTexture = rt;
         handCam.Render();
-        handCam.enabled = false; // deactivate immediately after rendering
+        handCam.enabled = false;
 
         iconInstance = new GameObject("ItemIcon");
         iconInstance.transform.SetParent(canvas, false);
@@ -57,23 +99,28 @@ public class HoldableItem : MonoBehaviour
 
         RectTransform rtUI = iconInstance.GetComponent<RectTransform>();
         rtUI.sizeDelta = new Vector2(64, 64);
-        rtUI.anchorMin = rtUI.anchorMax = isLeftHand ? new Vector2(0.1f, 0.1f) : new Vector2(0.9f, 0.1f);
+        rtUI.anchorMin = rtUI.anchorMax =
+            isLeftHand ? new Vector2(0.1f, 0.1f) : new Vector2(0.9f, 0.1f);
         rtUI.anchoredPosition = Vector2.zero;
 
-        CanvasGroup cg = iconInstance.AddComponent<CanvasGroup>();
+        iconInstance.AddComponent<CanvasGroup>();
 
         UIDragItem drag = iconInstance.AddComponent<UIDragItem>();
         drag.Init(canvas.GetComponent<Canvas>(), this);
 
         Button btn = iconInstance.AddComponent<Button>();
-        btn.onClick.AddListener(Drop);
+        btn.onClick.RemoveAllListeners();
+        btn.onClick.AddListener(() =>
+        {
+            if (isInSlot)
+                PickupFromSlot(canvas, player);
+            else
+                Drop();
+        });
     }
-
-
 
     public void Drop()
     {
-        // Clear hand assignment and camera texture
         if (isLeftHand)
         {
             leftHand = null;
@@ -85,13 +132,151 @@ public class HoldableItem : MonoBehaviour
             rightHandCamera.targetTexture = null;
         }
 
-        // Remove UI icon
-        if (iconInstance != null) Destroy(iconInstance);
+        if (iconInstance != null)
+            Destroy(iconInstance);
 
-        // Place object back in the world
-        gameObject.SetActive(true);
+        isInSlot = false;
+
         transform.SetParent(null);
-        transform.position = player.position + player.forward * 3f + Vector3.up ;
-        gameObject.layer = 0; // reset layer to default
+        transform.position = player.position + player.forward * 3f + Vector3.up;
+        gameObject.layer = 0;
+
+        rb.constraints = RigidbodyConstraints.None;
     }
+
+    public void PickupFromSlot(Transform canvas, Transform playerTransform)
+    {
+        if (leftHand != null && rightHand != null)
+            return;
+
+        UnfreezePhysics();
+
+        if (iconInstance != null)
+            Destroy(iconInstance);
+
+        isInSlot = false;
+        Pickup(playerTransform, canvas);
+    }
+
+    #endregion
+
+    #region COOKING
+
+    public bool CanBeCooked()
+    {
+        return cookState == CookState.Raw;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (!isInSlot) return;
+
+        if (collision.gameObject.CompareTag("CookingSurface"))
+        {
+            FreezePhysics();
+        }
+    }
+
+    #endregion
+
+    #region REPLACE VISUAL (FIXED)
+
+    public void ReplaceWith(GameObject newPrefab)
+    {
+        if (newPrefab == null)
+        {
+            Debug.LogError($"[{name}] ReplaceWith failed: prefab is NULL", this);
+            return;
+        }
+
+        if (currentVisual == null)
+        {
+            Debug.LogError($"[{name}] currentVisual is NULL — RAW mesh not registered!", this);
+            return;
+        }
+
+        Bounds oldBounds = GetCombinedBounds(currentVisual);
+
+        Destroy(currentVisual);
+
+        currentVisual = Instantiate(newPrefab, transform);
+
+        SetActiveRecursively(currentVisual.transform, true);
+        SetLayerRecursively(currentVisual.transform, gameObject.layer);
+
+        currentVisual.transform.localRotation = Quaternion.identity;
+        currentVisual.transform.localScale = Vector3.one;
+
+        Bounds newBounds = GetCombinedBounds(currentVisual);
+        float yOffset = oldBounds.min.y - newBounds.min.y;
+
+        currentVisual.transform.position += Vector3.up * yOffset;
+    }
+
+    private Bounds GetCombinedBounds(GameObject obj)
+    {
+        Renderer[] renderers = obj.GetComponentsInChildren<Renderer>();
+        if (renderers.Length == 0)
+            return new Bounds(obj.transform.position, Vector3.zero);
+
+        Bounds bounds = renderers[0].bounds;
+        for (int i = 1; i < renderers.Length; i++)
+            bounds.Encapsulate(renderers[i].bounds);
+
+        return bounds;
+    }
+
+    #endregion
+
+    #region UTILITIES
+
+    private void SetLayerRecursively(Transform t, int layer)
+    {
+        t.gameObject.layer = layer;
+        foreach (Transform child in t)
+            SetLayerRecursively(child, layer);
+    }
+
+    private void SetActiveRecursively(Transform t, bool active)
+    {
+        t.gameObject.SetActive(active);
+        foreach (Transform child in t)
+            SetActiveRecursively(child, active);
+    }
+
+    public void FreezePhysics()
+    {
+        if (rb == null) return;
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.constraints = RigidbodyConstraints.FreezeAll;
+        frozenBySlot = true;
+    }
+
+    public void ReleaseHand()
+    {
+        if (isLeftHand && leftHand == this)
+        {
+            leftHand = null;
+            if (leftHandCamera != null)
+                leftHandCamera.targetTexture = null;
+        }
+        else if (!isLeftHand && rightHand == this)
+        {
+            rightHand = null;
+            if (rightHandCamera != null)
+                rightHandCamera.targetTexture = null;
+        }
+    }
+
+    public void UnfreezePhysics()
+    {
+        if (rb == null) return;
+
+        rb.constraints = RigidbodyConstraints.None;
+        frozenBySlot = false;
+    }
+
+    #endregion
 }
