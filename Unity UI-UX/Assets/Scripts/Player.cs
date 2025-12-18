@@ -18,14 +18,25 @@ public class Player : MonoBehaviour
     private Vector3 input = Vector3.zero;
     private float targetYaw;
     private float currentYaw;
+    [HideInInspector]
+    public bool IsBlocked = false;
+    [SerializeField] private InventoryUI inventoryUI;
 
 
     [SerializeField] private UIObject Objui;
 
     private void Reset() => rigidBody = GetComponent<Rigidbody>();
 
+    //public bool IsBlocked { get; set; } = false;
+
     public void Player_OnMove(CallbackContext context)
     {
+        if (IsBlocked)
+        {
+            input = Vector3.zero; // block movement input
+            return;
+        }
+
         input = context.ReadValue<Vector2>();
         input.z = input.y;
         input.y = 0;
@@ -33,11 +44,24 @@ public class Player : MonoBehaviour
 
     public void Player_OnLook(CallbackContext context)
     {
+        if (IsBlocked) return;
+
         if (!context.performed) return;
         float x = context.ReadValue<Vector2>().x;
         targetYaw += x * 90f;
     }
 
+    private void FixedUpdate()
+    {
+        if (IsBlocked)
+        {
+            rigidBody.linearVelocity = new Vector3(0, rigidBody.linearVelocity.y, 0);
+            return;
+        }
+
+        Vector3 move = root.forward * input.z + root.right * input.x;
+        rigidBody.linearVelocity = new Vector3(move.x * speed, rigidBody.linearVelocity.y, move.z * speed);
+    }
 
     private void LateUpdate()
     {
@@ -45,10 +69,5 @@ public class Player : MonoBehaviour
         root.localRotation = Quaternion.Euler(0f, currentYaw, 0f);
     }
 
-    private void FixedUpdate()
-    {
-        Vector3 move = root.forward * input.z + root.right * input.x;
-        rigidBody.linearVelocity = move * speed + new Vector3(0, rigidBody.linearVelocity.y, 0);
-    }
 
 }
