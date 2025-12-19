@@ -11335,7 +11335,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3413316100383871838, guid: 775ba1a18453b9c4a83e7486c97deb5b, type: 3}
       propertyPath: m_Name
-      value: ui
+      value: Book & Cie
       objectReference: {fileID: 0}
     - target: {fileID: 7239813316190469452, guid: 775ba1a18453b9c4a83e7486c97deb5b, type: 3}
       propertyPath: m_LocalPosition.x

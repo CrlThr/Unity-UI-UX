@@ -68,7 +68,7 @@ public class CookingSlot : MonoBehaviour
                 else if (item.cookState == HoldableItem.CookState.Cooked)
                 {
                     overcookTimer += Time.deltaTime * multiplier;
-                    if (overcookTimer >= 5f)
+                    if (overcookTimer >= 15f)
                     {
                         item.cookState = HoldableItem.CookState.Overcooked;
                         item.ReplaceWith(item.CuissonItem2);

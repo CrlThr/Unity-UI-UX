@@ -9,7 +9,7 @@ public class BookManager : MonoBehaviour
     
     [Header("Paramètres recettes")]
     [SerializeField] public List<Recipe> recipeList; // La source de données du livre
-    public List<Recipe> allRecipes = new List<Recipe>();
+    // public List<Recipe> allRecipes = new List<Recipe>();
 
     [Header("Pages")]
     [SerializeField] private Page LeftPage;
