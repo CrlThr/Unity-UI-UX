@@ -179,31 +179,37 @@ public class HoldableItem : MonoBehaviour
 
     #endregion
 
-    #region REPLACE VISUAL
+    #region REPLACE VISUAL (FIXED)
 
     public void ReplaceWith(GameObject newPrefab)
     {
         if (newPrefab == null || currentVisual == null) return;
 
+        // 1. Get components from the prefab
         MeshFilter newMF = newPrefab.GetComponent<MeshFilter>();
         MeshRenderer newMR = newPrefab.GetComponent<MeshRenderer>();
 
+        // 2. Get components on the active item
         MeshFilter currentMF = currentVisual.GetComponent<MeshFilter>();
         MeshRenderer currentMR = currentVisual.GetComponent<MeshRenderer>();
 
+        // 3. Swap the data (Texture and Shape)
         if (currentMF != null && newMF != null)
-            currentMF.mesh = newMF.sharedMesh;
+            currentMF.sharedMesh = newMF.sharedMesh;
 
         if (currentMR != null && newMR != null)
-            currentMR.materials = newMR.sharedMaterials;
+            currentMR.sharedMaterials = newMR.sharedMaterials;
 
-        // Keep the visual relative to the root
+        // 4. FORCE LOCAL RESET
+        // This ensures the visual stays glued to the Root transform (the slot)
         currentVisual.transform.localPosition = Vector3.zero;
         currentVisual.transform.localRotation = Quaternion.identity;
         currentVisual.transform.localScale = Vector3.one;
 
-        // Calculate vertical offset based on mesh bounds (local space)
-        Bounds rootBounds = GetCombinedBounds(gameObject); // root HoldableItem
+        SetLayerRecursively(currentVisual.transform, gameObject.layer);
+
+    // Calculate vertical offset based on mesh bounds (local space)
+     Bounds rootBounds = GetCombinedBounds(gameObject); // root HoldableItem
         Bounds visualBounds = GetCombinedBounds(currentVisual);
         float yOffset = rootBounds.min.y - visualBounds.min.y;
         currentVisual.transform.localPosition += Vector3.up * yOffset;

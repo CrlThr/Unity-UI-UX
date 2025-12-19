@@ -54,6 +54,14 @@ public class CookingSlot : MonoBehaviour
                     {
                         item.cookState = HoldableItem.CookState.Cooked;
                         item.ReplaceWith(item.CuissonItem1);
+                        if (cookedTimer >= item.CookTime)
+                        {
+                            item.cookState = HoldableItem.CookState.Cooked;
+                            item.ReplaceWith(item.CuissonItem1);
+
+                            // REDOT THE POSITION: This forces it back to the slot if it tried to move
+                            item.transform.position = itemPoint.position + Vector3.up * slotHeightOffset;
+                        }
                     }
                 }
                 // Overcooking
@@ -64,6 +72,8 @@ public class CookingSlot : MonoBehaviour
                     {
                         item.cookState = HoldableItem.CookState.Overcooked;
                         item.ReplaceWith(item.CuissonItem2);
+                        item.transform.position = itemPoint.position + Vector3.up * slotHeightOffset;
+                        
                         yield break;
                     }
                 }
